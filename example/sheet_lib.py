@@ -1,47 +1,64 @@
 import pygsheets
 
 
-class GoogleSheet:
-    def __init__(self):
+class googleSheet:
+    def __init__(self, sheet_title):
         # self.spreadsheet_id = spreadsheet_id
         survey_url = 'https://docs.google.com/spreadsheets/d/1YC0ZVH-xyqAypAp47CnWzmTcFZWsyhRZGI7Gc_GEb5I/edit#gid=507784060'
         self.gc = pygsheets.authorize(service_account_file='/code/credentials.json')
         self.sheet = self.gc.open_by_url(survey_url)
+        self.sheet_title = sheet_title
 
-    def create_sheet(self, sheet_title):
-        new_sheet = self.sheet.add_worksheet(sheet_title)
+    def create_sheet(self):
+        new_sheet = self.sheet.add_worksheet(self.sheet_title)
         return new_sheet
 
-    def read_sheet(self, sheet_title):
-        worksheet = self.sheet.worksheet_by_title(sheet_title)
+    def read_sheet_cell(self, site):
+        worksheet = self.sheet.worksheet_by_title(self.sheet_title)
+        data = worksheet.get_value(site)
+        return data
+
+    def read_sheet_range(self, start, end):
+        worksheet = self.sheet.worksheet_by_title(self.sheet_title)
+        data = worksheet.get_values(start, end, returnas='matrix')
+        return data
+
+    def read_sheet_all(self):
+        worksheet = self.sheet.worksheet_by_title(self.sheet_title)
         # 取得全部，但過濾掉空值空字串空list
-        data_list = worksheet.get_all_values(returnas='matrix', include_tailing_empty=False)
+        data_list = worksheet.get_all_values(
+            returnas='matrix', include_tailing_empty=False)
         new_data = []
         for data in data_list:
-            if(len(data) == 0):
+            if (len(data) == 0):
                 continue
             new_data.append(data)
 
-        #過濾掉空值空字串
+        # 過濾掉空值空字串
         # data = [x for x in data if x != ['']]
         return new_data
 
-    def update_sheet(self, sheet_title, data):
-        worksheet = self.sheet.worksheet_by_title(sheet_title)
-        worksheet.clear()
-        worksheet.update_values(data)
+    def update_sheet(self, site, data):
+        try:
+            worksheet = self.sheet.worksheet_by_title(self.sheet_title)
+            worksheet.update_value(site, data)
+        except Exception as e:
+           return False
+        return True
 
-    def delete_sheet(self, sheet_title):
-        worksheet = self.sheet.worksheet_by_title(sheet_title)
-        self.sheet.del_worksheet(worksheet)
+
 
 # Usage example
 # spreadsheet_id = '17fti37_SPCGL2lSESR1AFEIwy-7DfBw3GKIlp2fZH7Y'
-sheet = GoogleSheet()
+sheet = googleSheet('user')
 # # new_sheet = sheet.create_sheet('New Sheet')
 # # data = [['Name', 'Age'], ['John', '25'], ['Jane', '30']]
 # # sheet.update_sheet('New Sheet', data)
-sheet_data = sheet.read_sheet('2023')
+# sheet_data = sheet.read_sheet_all()
+# print(sheet_data)
+sheet_data = sheet.update_sheet('A1', 'test')
+
+
 print(sheet_data)
 # # sheet.delete_sheet('New Sheet')
 
