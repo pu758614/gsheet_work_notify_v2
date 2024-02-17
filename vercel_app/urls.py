@@ -20,5 +20,6 @@ from example import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('example.urls')),
-    path('api/lineCallback', views.lineCallback)
+    path('api/lineCallback', views.lineCallback),
+    path('trigger_notify', views.trigger_notify)
 ]

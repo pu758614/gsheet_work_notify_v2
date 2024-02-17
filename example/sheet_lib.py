@@ -1,11 +1,31 @@
+import json
 import pygsheets
-
+import tempfile
+from django.conf import settings
 
 class googleSheet:
     def __init__(self, sheet_title):
         # self.spreadsheet_id = spreadsheet_id
         survey_url = 'https://docs.google.com/spreadsheets/d/1YC0ZVH-xyqAypAp47CnWzmTcFZWsyhRZGI7Gc_GEb5I/edit#gid=507784060'
-        self.gc = pygsheets.authorize(service_account_file='/code/credentials.json')
+        temp_data =json.dumps({
+            "type": "service_account",
+            "project_id": settings.SHEET_PROJECT_ID,
+            "private_key_id": settings.SHEET_PRIVATE_KEY_ID,
+            "private_key": settings.SHEET_PRIVATE_KEY.replace("\\n",'\n'),
+            "client_email": settings.SHEET_CLIENT_EMAIL,
+            "client_id": settings.SHEET_CLIENT_ID,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": settings.SHEET_CLIENT_X509_CERT_URL,
+            "universe_domain": "googleapis.com"
+        }).encode('utf-8')
+
+        temp = tempfile.NamedTemporaryFile()
+        temp.write(temp_data)
+        temp.flush()
+
+        self.gc = pygsheets.authorize(service_account_file=temp.name)
         self.sheet = self.gc.open_by_url(survey_url)
         self.sheet_title = sheet_title
 
@@ -38,28 +58,50 @@ class googleSheet:
         # data = [x for x in data if x != ['']]
         return new_data
 
-    def update_sheet(self, site, data):
+    # pygsheets insert last row
+    def insert_sheet(self, data):
         try:
             worksheet = self.sheet.worksheet_by_title(self.sheet_title)
-            worksheet.update_value(site, data)
+            data1=['Jack',80,90]
+            worksheet.append_table(data,start='A2')
         except Exception as e:
-           return False
+            return False
         return True
 
 
 
+    def update_sheet(self, site, data):
+        worksheet = self.sheet.worksheet_by_title(self.sheet_title)
+        worksheet.update_value(site, data)
+        return True
+
+    def check_user(self, user_id):
+        data = self.read_sheet_all()
+        is_exist = False
+        for row in data:
+            if (row[0] == user_id):
+                is_exist = True
+                break
+        return is_exist
+
+    def add_user(self, user_id, user_name):
+
+        data = [user_id, user_name]
+        self.insert_sheet(data)
+
+
 # Usage example
 # spreadsheet_id = '17fti37_SPCGL2lSESR1AFEIwy-7DfBw3GKIlp2fZH7Y'
-sheet = googleSheet('user')
+# sheet = googleSheet('user')
 # # new_sheet = sheet.create_sheet('New Sheet')
 # # data = [['Name', 'Age'], ['John', '25'], ['Jane', '30']]
 # # sheet.update_sheet('New Sheet', data)
 # sheet_data = sheet.read_sheet_all()
 # print(sheet_data)
-sheet_data = sheet.update_sheet('A1', 'test')
+# sheet_data = sheet.update_sheet('A1', 'test')
 
 
-print(sheet_data)
+# print(sheet_data)
 # # sheet.delete_sheet('New Sheet')
 
 # credentials = {

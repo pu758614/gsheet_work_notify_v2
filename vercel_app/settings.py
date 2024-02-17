@@ -11,9 +11,28 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT, PROJECT_MODULE_NAME = os.path.split(PROJECT_PATH)
+
+env_file = '.env'
+env = environ.Env()
+if os.path.exists(os.path.join(PROJECT_ROOT, env_file)):
+    env.read_env(env_file=os.path.join(PROJECT_ROOT, env_file))
+LINE_CHANNEL_ACCESS_TOKEN = env('LINE_CHANNEL_ACCESS_TOKEN')
+LINE_CHANNEL_SECRET = env('LINE_CHANNEL_SECRET')
+SHEET_PROJECT_ID = env('SHEET_PROJECT_ID')
+SHEET_PRIVATE_KEY_ID = env('SHEET_PRIVATE_KEY_ID')
+SHEET_PRIVATE_KEY = env('SHEET_PRIVATE_KEY')
+SHEET_CLIENT_EMAIL = env('SHEET_CLIENT_EMAIL')
+SHEET_CLIENT_ID = env('SHEET_CLIENT_ID')
+SHEET_CLIENT_X509_CERT_URL = env('SHEET_CLIENT_X509_CERT_URL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# environ.Env()引入.env檔案
 
 
 # Quick-start development settings - unsuitable for production

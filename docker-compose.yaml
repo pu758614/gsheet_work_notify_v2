@@ -1,0 +1,9 @@
+services:
+  djnago:
+    build: .
+    container_name: gsheet_work_notify_v2
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code gsheet_work_notify_v2
+    ports:
+      - "5000:8000"
