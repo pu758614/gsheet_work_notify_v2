@@ -10,11 +10,5 @@
       "src": "/(.*)",
       "dest": "vercel_app/wsgi.py"
     }
-  ],
-  "crons": [
-    {
-      "path": "daily_notify",
-      "schedule": "0 5 * * *"
-    }
   ]
 }
