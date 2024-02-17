@@ -14,7 +14,7 @@
   "crons": [
     {
       "path": "daily_notify",
-      "schedule": "*/2 * * * *"
+      "schedule": "0 5 * * *"
     }
   ]
 }
