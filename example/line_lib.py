@@ -11,9 +11,18 @@ class lineLib:
         self.line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
         self.parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-    def sendMessage(self,uuid,msg):
+    def emoji(self,code):
+        bin_str = bytes.fromhex((8 - len(code)) * '0' + code).decode('utf-32-be')
+        return bin_str
 
+    def sendMessage(self,uuid,msg):
         self.line_bot_api.push_message(uuid, TextSendMessage(text=msg))
+
+    def replySendMessage(self,reply_token,msg_list):
+        message = []
+        for mtext in msg_list:
+            message.append(TextSendMessage(text=mtext))
+        self.line_bot_api.reply_message(reply_token,message)
 
     def parseRequest(self,request):
         signature = request.META['HTTP_X_LINE_SIGNATURE']

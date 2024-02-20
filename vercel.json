@@ -10,11 +10,5 @@
       "src": "/(.*)",
       "dest": "vercel_app/wsgi.py"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron",
-      "schedule": "*/3 * * * *"
-    }
   ]
 }
