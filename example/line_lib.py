@@ -42,8 +42,30 @@ class lineLib:
             if isinstance(event, MessageEvent):
                 message=event.message.text
 
-            # message.append(TextSendMessage(text=mtext))
-            # self.line_bot_api.reply_message(event.reply_token,message)
+            data={
+                'user_id':user_id,
+                # 'profile':profile,
+                'user_name':profile.display_name,
+                'message':message,
+                'msg_type':msg_type,
+                'reply_token':reply_token
+            }
+            return data
+        except Exception as e:
+           return
+        try:
+            events = self.parser.parse(body, signature)
+            event = events[0]
+            user_id = event.source.user_id
+            msg_type = event.source.type
+            reply_token = event.reply_token
+
+            profile = self.line_bot_api.get_profile(user_id)
+            #url decode
+
+            message = ''
+            if isinstance(event, MessageEvent):
+                message=event.message.text
 
             data={
                 'user_id':user_id,
