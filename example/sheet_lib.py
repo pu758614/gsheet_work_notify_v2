@@ -1,3 +1,4 @@
+import datetime
 import json
 import pygsheets
 import tempfile
@@ -107,11 +108,38 @@ class googleSheet:
                 break
         return name_list
 
+
+    # 兩個日期比較大小
+    def compare_date(self,date1, date2):
+        date1 = datetime.datetime.strptime(date1, '%m/%d')
+        date2 = datetime.datetime.strptime(date2, '%m/%d')
+        if date1 > date2:
+            return 1
+        elif date1 < date2:
+            return -1
+        else:
+            return 0
+
+    def is_date(self,date):
+        try:
+            datetime.datetime.strptime(date, '%m/%d')
+            return True
+        except ValueError:
+            return False
+
+
     def getNextWorks(self,name_list):
         data_list=self.read_sheet_all()
         work_date_list = {}
+        now_date = datetime.datetime.now().strftime('%m/%d')
+
         for row in data_list:
             work_date = row[0]
+            if(not self.is_date(work_date)):
+                continue
+            is_over = self.compare_date(work_date,now_date)
+            if(is_over==-1):
+                continue
             for index, row_data in enumerate(row):
                 if(row_data in name_list):
                     field_code = chr(65+index)

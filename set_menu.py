@@ -16,7 +16,7 @@ body = {
     'size': {'width': 2498, 'height': 928},   # 設定尺寸
     'selected': 'true',                        # 預設是否顯示
     'name': 'Richmenu demo',                   # 選單名稱
-    'chatBarText': '小天使在上班的路上',            # 選單在 LINE 顯示的標題
+    'chatBarText': '請以週報.群組記事本的為主',            # 選單在 LINE 顯示的標題
     'areas':[                                  # 選單內容
         {
           'bounds': {'x': 0, 'y': 0, 'width': 314, 'height': 332}, # 選單位置與大小
