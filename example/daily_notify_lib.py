@@ -35,22 +35,16 @@ def daily_notify():
     now_year = datetime.datetime.now().strftime('%Y')
     next_saturday = (datetime.datetime.now() + datetime.timedelta(days=(5 - datetime.datetime.now().weekday()) % 7)).strftime('%m/%d')
     user_list = getToDayNotifyUser()
-    user_name_key_list = {}
-
+    print(datetime.datetime.now())
     # 如果開頭是0，去掉0
     if next_saturday[0] == '0':
         next_saturday = next_saturday[1:]
 
-    # 取得現在星期幾
-    now_week_day= datetime.datetime.today().weekday()+1
-    # print(user_list)
-    # print(datetime.datetime.now().weekday())
-
-    # print(next_saturday)
 
     google_sheet_lib = googleSheet(now_year)
     data_list = google_sheet_lib.read_sheet_all()
     line_lib = lineLib()
+    print(user_list)
     # print(field_code_conf)
     notify_data_list = {}
     for row in data_list:
@@ -68,7 +62,7 @@ def daily_notify():
                         'work_item':[]
                     }
                 notify_data_list[user_data['name']]['work_item'].append(field_code_conf[field_code])
-
+    print(notify_data_list)
     for user_name in notify_data_list:
         notify_data = notify_data_list[user_name]
         #list 轉字串
