@@ -80,9 +80,9 @@ def lineCallback(request):
                 work_name_list = work_list[work_date]
                 work_name_str = '、'.join(work_name_list)
                 send_msg += f"{work_date} {work_name_str}\n"
-            send_msg += f"\n請您預備心服事呦。{line_lib.emoji("10008D")}"
+            send_msg += "\n請您預備心服事呦。"+line_lib.emoji("10008D")
         else:
-            send_msg = f'您接下來暫時沒有其他服事呦！{line_lib.emoji("10008E")}'
+            send_msg = f'您接下來暫時沒有其他服事呦！'+line_lib.emoji("10008E")
     elif(msg=='小天使, 請問這怎麼用?'):
         notify_user_name = data['user_name']
         send_msg = f"嗨 {notify_user_name} ~ 您可以點選下方選單日~六設定通知日，若不想接收通知請點選「關閉提醒」。\n\n";
