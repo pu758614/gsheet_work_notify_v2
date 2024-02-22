@@ -95,8 +95,7 @@ def lineCallback(request):
         send_msg_list.append(send_msg)
     if(len(send_msg_list)>0):
         line_lib.replySendMessage(data['reply_token'],send_msg_list)
-
-
+    googleSheet('record').write_record(data['user_name'],'echo',msg,send_msg)
     return HttpResponse()
 
 
