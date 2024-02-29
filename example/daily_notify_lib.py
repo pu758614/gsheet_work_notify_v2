@@ -38,8 +38,8 @@ def daily_notify():
     # 如果開頭是0，去掉0
     if next_saturday[0] == '0':
         next_saturday = next_saturday[1:]
-
-
+    # 把日的數字0去掉 ex:3/02 -> 3/2
+    next_saturday = next_saturday.replace('/0', '/')
     google_sheet_lib = googleSheet(now_year)
     data_list = google_sheet_lib.read_sheet_all()
     notify_data_list = {}
