@@ -8,10 +8,8 @@ media
 # Environments
 .env
 .venv
-credentials.json
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
-credentials.json
