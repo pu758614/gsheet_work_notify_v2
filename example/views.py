@@ -36,7 +36,6 @@ def lineCallback(request):
 
     user_info = google_sheet_lib.get_user_info(data['user_id'])
 
-
     msg = data['message']
 
     set_conf = {

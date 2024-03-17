@@ -165,5 +165,7 @@ class googleSheet:
         return user_info
 
     def write_record(self,user_id,log_type,request,response):
-        log_data = [datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),user_id,log_type,request,response]
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        now = f'.{now}'
+        log_data = [now,user_id,log_type,request,response]
         self.insert_sheet(log_data)
