@@ -113,4 +113,4 @@ def index(request):
     '''
     msg=daily_notify_lib.daily_notify_test()
     return HttpResponse(msg)
-    return HttpResponse(html)
+    # return HttpResponse(html)
