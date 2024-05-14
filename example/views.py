@@ -11,7 +11,7 @@ from linebot.models import MessageEvent, TextSendMessage
 from example.line_lib import lineLib
 from example.sheet_lib import googleSheet
 from example import daily_notify_lib
-
+import time
 @api_view(["GET"])
 def trigger_notify(request):
     daily_notify_lib.daily_notify()
@@ -103,14 +103,17 @@ def lineCallback(request):
 
 def index(request):
     now = datetime.now()
+    msg=daily_notify_lib.daily_notify_test()
     html = f'''
     <html>
         <body>
-            <h1>yyyyyyHello from Vercel!</h1>
+            <h1>6666666666666Hello from Vercel!</h1>
             <p>The current time is { now }.</p>
         </body>
+        {msg}
     </html>
     '''
-    msg=daily_notify_lib.daily_notify_test()
-    return HttpResponse(msg)
+    # time.sleep(3)
+
+    return HttpResponse(html,)
     # return HttpResponse(html)

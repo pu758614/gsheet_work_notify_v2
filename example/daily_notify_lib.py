@@ -1,4 +1,4 @@
-import datetime
+import datetime,time
 from example.line_lib import lineLib
 from example.sheet_lib import googleSheet
 
@@ -65,7 +65,7 @@ def daily_notify():
         msg = f"{user_name} 平安！\n您這週六({next_saturday})有{items_str}的服事，請預備心服事，願神祝福您。{emoji('10008D')}"
         lineLib().sendMessage(notify_data['user_id'],msg)
         googleSheet('record').write_record(user_name,'notify','',msg)
-
+        time.sleep(3)
     return True
 
 def daily_notify_test():
