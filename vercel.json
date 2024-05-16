@@ -18,13 +18,5 @@
       "src": "/(.*)",
       "dest": "vercel_app/wsgi.py"
     }
-  ],
-  "functions": {
-    "example/*.py": {
-      "maxDuration": 60
-    },
-    "vercel_app/*.py": {
-      "maxDuration": 60
-    }
-  }
+  ]
 }
