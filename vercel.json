@@ -2,15 +2,7 @@
   "builds": [
     {
       "src": "vercel_app/wsgi.py",
-      "use": "@vercel/python",
-      "functions": {
-        "example/*.py":{
-          "maxDuration":60
-        },
-        "vercel_app/*.py":{
-          "maxDuration":60
-        }
-      }
+      "use": "@vercel/python"
     }
   ],
   "routes": [
@@ -18,5 +10,10 @@
       "src": "/(.*)",
       "dest": "vercel_app/wsgi.py"
     }
-  ]
+  ],
+  "functions": {
+    "vercel_app/wsgi.py": {
+      "maxDuration": 60
+    }
+  }
 }
