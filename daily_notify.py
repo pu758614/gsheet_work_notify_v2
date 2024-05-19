@@ -1,6 +1,6 @@
 import os
 import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE","vercel_app.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE","api.settings")
 django.setup()
 
 

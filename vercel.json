@@ -2,11 +2,11 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "vercel_app/wsgi.py"
+      "dest": "api/wsgi.py"
     }
   ],
   "functions": {
-    "vercel_app/*": {
+    "api/*": {
       "maxDuration": 30
     }
   }
