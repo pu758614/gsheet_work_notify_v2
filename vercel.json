@@ -3,6 +3,14 @@
     {
       "src": "vercel_app/wsgi.py",
       "use": "@vercel/python",
+      "functions": {
+        "example/*.py":{
+          "maxDuration":60
+        },
+        "vercel_app/*.py":{
+          "maxDuration":60
+        }
+      }
     }
   ],
   "routes": [
