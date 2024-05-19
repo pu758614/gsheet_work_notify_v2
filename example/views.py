@@ -107,13 +107,13 @@ def index(request):
     html = f'''
     <html>
         <body>
-            <h1>191919777777Hello from Vercel!</h1>
+            <h1>19191988888888Hello from Vercel!</h1>
             <p>The current time is { now }.</p>
         </body>
         {msg}
     </html>
     '''
-    # time.sleep(3)
+    time.sleep(15)
 
     return HttpResponse(html,)
     # return HttpResponse(html)
