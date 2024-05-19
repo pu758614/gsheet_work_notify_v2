@@ -6,7 +6,7 @@
     }
   ],
   "functions": {
-    "api/*": {
+    "vercel_app/*": {
       "maxDuration": 30
     }
   }
