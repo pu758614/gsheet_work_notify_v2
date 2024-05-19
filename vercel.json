@@ -12,7 +12,7 @@
     }
   ],
   "functions": {
-    "vercel_app/wsgi.py": {
+    "example/*.py": {
       "maxDuration": 60
     }
   }
