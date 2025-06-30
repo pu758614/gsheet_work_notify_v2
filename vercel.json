@@ -1,18 +1,13 @@
-
 {
-  "functions": {
-    "api/*.py": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/api/index.py" }
+    {
+      "src": "/(.*)",
+      "dest": "api/wsgi.py"
+    }
   ],
-  "build": {
-    "env": {
-      "PIP_TARGET": "./.vercel_cache"
+  "functions": {
+    "api/*": {
+      "maxDuration": 30
     }
   }
 }
