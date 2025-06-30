@@ -109,7 +109,7 @@ class GptLib:
 
             # 呼叫 OpenAI API
             response = openai.ChatCompletion.create(
-                model="gpt-4",  # 可以根據需要替換為其他模型
+                model="gpt-4.1-nano",  # 可以根據需要替換為其他模型
                 messages=messages,
                 max_tokens=1000,
                 temperature=0.7
