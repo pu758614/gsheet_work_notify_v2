@@ -13,7 +13,6 @@ class GptLib:
     def get_context_from_sheet(self):
         """從 Google Sheet 獲取當前年份的服事資料和使用者資料，作為 GPT 的上下文"""
         now_year = datetime.datetime.now().strftime('%Y')
-        now_date = datetime.datetime.now()
         user_sheet = googleSheet('user')
         year_sheet = googleSheet(now_year)
 
@@ -48,35 +47,22 @@ class GptLib:
                 if not self._is_date(service_date):
                     continue
 
-                # 將服事日期轉換為 datetime 對象進行比較
-                try:
-                    # 解析 mm/dd 格式的日期，加上當前年份
-                    date_parts = service_date.split('/')
-                    service_datetime = datetime.datetime(now_date.year, int(date_parts[0]), int(date_parts[1]))
+                service_info = {
+                    "date": service_date,
+                    "services": []
+                }
 
-                    # 如果日期已過期，則跳過
-                    if service_datetime < now_date:
-                        continue
+                for index, person in enumerate(row[1:], 1):
+                    if person:
+                        field_code = chr(65 + index)
+                        if field_code in field_code_conf:
+                            service_type = field_code_conf[field_code]
+                            service_info["services"].append({
+                                "type": service_type,
+                                "person": person
+                            })
 
-                    service_info = {
-                        "date": service_date,
-                        "services": []
-                    }
-
-                    for index, person in enumerate(row[1:], 1):
-                        if person:
-                            field_code = chr(65 + index)
-                            if field_code in field_code_conf:
-                                service_type = field_code_conf[field_code]
-                                service_info["services"].append({
-                                    "type": service_type,
-                                    "person": person
-                                })
-
-                    context["services"].append(service_info)
-                except ValueError:
-                    # 日期解析錯誤，跳過此行
-                    continue
+                context["services"].append(service_info)
 
         return context
 
@@ -98,9 +84,10 @@ class GptLib:
             user_specific_data = {}
             if user_id:
                 user_specific_data = self._filter_user_data(context_data, user_id, user_name)
-
+            date = datetime.datetime.now().strftime('%Y/%m/%d')
             # 組合提示詞
-            system_prompt = """
+            system_prompt = f"""
+            今天日期是：{date}。請根據以下資料回答問題。
             你是一個協助基督教會服事的AI助理，名叫「服事提醒小天使」。你可以回答關於教會服事的相關問題。
             請保持友善、專業的語氣，並在回答結尾使用適當的表情符號增加親和力。
             """
