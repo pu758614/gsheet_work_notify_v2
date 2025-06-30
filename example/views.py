@@ -60,6 +60,7 @@ def lineCallback(request):
         7: '日',
     }
     send_msg = ''
+    log_type = 'echo'
     if(msg in set_conf):
         notify_day = set_conf[msg]
         google_sheet_lib.set_user_notify_day(data['user_id'],notify_day)
@@ -105,12 +106,13 @@ def lineCallback(request):
         send_msg = gpt_response
         # AI警語
         send_msg += "\n\n提醒：以上內容由AI回覆，僅供參考，請自行判斷其正確性。"
+        log_type = 'echo_gpt'
 
     if(send_msg!=''):
         send_msg_list.append(send_msg)
     if(len(send_msg_list)>0):
         line_lib.replySendMessage(data['reply_token'],send_msg_list)
-    googleSheet('record').write_record(data['user_name'],'echo',msg,send_msg)
+    googleSheet('record').write_record(data['user_name'],log_type,msg,send_msg)
     return HttpResponse()
 
 
