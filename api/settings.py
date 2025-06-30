@@ -28,6 +28,8 @@ SHEET_PRIVATE_KEY = env('SHEET_PRIVATE_KEY')
 SHEET_CLIENT_EMAIL = env('SHEET_CLIENT_EMAIL')
 SHEET_CLIENT_ID = env('SHEET_CLIENT_ID')
 SHEET_CLIENT_X509_CERT_URL = env('SHEET_CLIENT_X509_CERT_URL')
+# OpenAI API Key
+OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

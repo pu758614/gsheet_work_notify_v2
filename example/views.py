@@ -10,6 +10,7 @@ from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import MessageEvent, TextSendMessage
 from example.line_lib import lineLib
 from example.sheet_lib import googleSheet
+from example.gpt_lib import GptLib
 from example import daily_notify_lib
 import time
 @api_view(["GET"])
@@ -89,6 +90,19 @@ def lineCallback(request):
             send_msg += f"目前您已經關閉提醒囉！"
         else:
             send_msg += f"目前您的通知日是星期{day_conf[user_info['notify_day']]}喔！"
+    # 處理自然語言查詢 - 如果訊息以「小天使, 」開頭但不是上述預設命令，則視為 GPT 查詢
+    elif(msg.startswith('小天使, ')):
+        # 創建 GPT 庫實例
+        gpt_lib = GptLib()
+
+        # 獲取 GPT 回應
+        gpt_response = gpt_lib.query_gpt(
+            msg,
+            user_id=data['user_id'],
+            user_name=data['user_name']
+        )
+
+        send_msg = gpt_response
 
     if(send_msg!=''):
         send_msg_list.append(send_msg)
