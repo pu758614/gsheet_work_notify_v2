@@ -13,6 +13,7 @@ class GptLib:
     def get_context_from_sheet(self):
         """從 Google Sheet 獲取當前年份的服事資料和使用者資料，作為 GPT 的上下文"""
         now_year = datetime.datetime.now().strftime('%Y')
+        now_date = datetime.datetime.now()
         user_sheet = googleSheet('user')
         year_sheet = googleSheet(now_year)
 
@@ -47,22 +48,35 @@ class GptLib:
                 if not self._is_date(service_date):
                     continue
 
-                service_info = {
-                    "date": service_date,
-                    "services": []
-                }
+                # 將服事日期轉換為 datetime 對象進行比較
+                try:
+                    # 解析 mm/dd 格式的日期，加上當前年份
+                    date_parts = service_date.split('/')
+                    service_datetime = datetime.datetime(now_date.year, int(date_parts[0]), int(date_parts[1]))
 
-                for index, person in enumerate(row[1:], 1):
-                    if person:
-                        field_code = chr(65 + index)
-                        if field_code in field_code_conf:
-                            service_type = field_code_conf[field_code]
-                            service_info["services"].append({
-                                "type": service_type,
-                                "person": person
-                            })
+                    # 如果日期已過期，則跳過
+                    if service_datetime < now_date:
+                        continue
 
-                context["services"].append(service_info)
+                    service_info = {
+                        "date": service_date,
+                        "services": []
+                    }
+
+                    for index, person in enumerate(row[1:], 1):
+                        if person:
+                            field_code = chr(65 + index)
+                            if field_code in field_code_conf:
+                                service_type = field_code_conf[field_code]
+                                service_info["services"].append({
+                                    "type": service_type,
+                                    "person": person
+                                })
+
+                    context["services"].append(service_info)
+                except ValueError:
+                    # 日期解析錯誤，跳過此行
+                    continue
 
         return context
 
