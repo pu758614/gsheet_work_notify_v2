@@ -103,6 +103,8 @@ def lineCallback(request):
         )
 
         send_msg = gpt_response
+        # AI警語
+        send_msg += "\n\n*提醒：以上內容由AI生成，僅供參考，請自行判斷其正確性。*"
 
     if(send_msg!=''):
         send_msg_list.append(send_msg)
