@@ -90,8 +90,8 @@ def lineCallback(request):
             send_msg += f"目前您已經關閉提醒囉！"
         else:
             send_msg += f"目前您的通知日是星期{day_conf[user_info['notify_day']]}喔！"
-    # 處理自然語言查詢 - 如果訊息以「小天使, 」開頭但不是上述預設命令，則視為 GPT 查詢
-    elif(msg.startswith('小天使, ')):
+    # 處理自然語言查詢 - 如果訊息以「小天使」開頭但不是上述預設命令，則視為 GPT 查詢
+    else:
         # 創建 GPT 庫實例
         gpt_lib = GptLib()
 
