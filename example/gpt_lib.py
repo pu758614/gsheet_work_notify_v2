@@ -93,26 +93,28 @@ class GptLib:
             # """
             system_prompt = f"""
             今天日期是：{date}，發問的人名子叫：{user_name}。請根據以下資料回答問題。
-            你是一個協助基督教會服事的AI助理，名叫「服事提醒小天使」。你可以回答關於教會服事的相關問題。
-            你應該根據提供的上下文資料來回答問題，但如果問題超出了上下文範圍，你可以提供一般性的建議或請求更多資訊。
-            請保持友善、專業的語氣，並在回答結尾使用適當的表情符號增加親和力。
+            你是一個協助基督教會服事的AI助理，名叫「服事提醒小天使」，主要是提醒每週六的服事人員。你可以回答關於教會服事的相關問題。
+            你要根據個人服事表內容提供的上下文資料來回答問題。
+            請保持友善、專業的語氣，並在回答結尾使用適當的表情符號增加親和力，但不用再建議繼續的問答。
             """
 
+            all_text = json.dumps(context_data['services'], ensure_ascii=False)
+            # print(all_text)
             # 組合上下文資料為文字
             context_text = json.dumps(user_specific_data if user_specific_data else context_data, ensure_ascii=False)
-
+            # print(f"Context : {context_text}， JSON Schema: {json_schema}")
             # 創建完整提示詞
             messages = [
                 {"role": "system", "content": system_prompt},
-                {"role": "system", "content": f"這是目前的服事資料和使用者資料：{context_text}"},
+                {"role": "system", "content": f"個人資料與服事表：{context_text}和完整的服事表: {all_text}"},
                 {"role": "user", "content": user_message}
             ]
 
             # 呼叫 OpenAI API
             response = openai.ChatCompletion.create(
-                model="gpt-4.1-nano",  # 可以根據需要替換為其他模型
+                model="gpt-4.1",  # 可以根據需要替換為其他模型
                 messages=messages,
-                max_tokens=1000,
+                max_tokens=600,
                 temperature=0.7
             )
 
