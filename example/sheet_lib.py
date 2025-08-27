@@ -9,19 +9,20 @@ class googleSheet:
     def __init__(self, sheet_title):
         # self.spreadsheet_id = spreadsheet_id
         survey_url = 'https://docs.google.com/spreadsheets/d/1YC0ZVH-xyqAypAp47CnWzmTcFZWsyhRZGI7Gc_GEb5I/edit#gid=507784060'
-        temp_data =json.dumps({
-            "type": "service_account",
-            "project_id": settings.SHEET_PROJECT_ID,
-            "private_key_id": settings.SHEET_PRIVATE_KEY_ID,
-            "private_key": settings.SHEET_PRIVATE_KEY.replace("\\n",'\n'),
-            "client_email": settings.SHEET_CLIENT_EMAIL,
-            "client_id": settings.SHEET_CLIENT_ID,
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_x509_cert_url": settings.SHEET_CLIENT_X509_CERT_URL,
-            "universe_domain": "googleapis.com"
-        }).encode('utf-8')
+        # temp_data =json.dumps({
+        #     "type": "service_account",
+        #     "project_id": settings.SHEET_PROJECT_ID,
+        #     "private_key_id": settings.SHEET_PRIVATE_KEY_ID,
+        #     "private_key": settings.SHEET_PRIVATE_KEY.replace("\\n",'\n'),
+        #     "client_email": settings.SHEET_CLIENT_EMAIL,
+        #     "client_id": settings.SHEET_CLIENT_ID,
+        #     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        #     "token_uri": "https://oauth2.googleapis.com/token",
+        #     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        #     "client_x509_cert_url": settings.SHEET_CLIENT_X509_CERT_URL,
+        #     "universe_domain": "googleapis.com"
+        # }).encode('utf-8')
+        temp_data = settings.SHEET_KEY_SETTING.encode('utf-8')
 
         temp = tempfile.NamedTemporaryFile()
         temp.write(temp_data)
