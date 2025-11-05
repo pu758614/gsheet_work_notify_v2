@@ -153,7 +153,7 @@ class GptLib:
 
             # 呼叫 OpenAI API
             response = openai.ChatCompletion.create(
-                model="gpt-4o",  # 可以根據需要替換為其他模型
+                model="gpt-4.1-mini",  # 可以根據需要替換為其他模型
                 messages=messages,
                 max_tokens=600,
                 temperature=0.7
