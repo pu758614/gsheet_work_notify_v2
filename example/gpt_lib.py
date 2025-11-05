@@ -5,6 +5,7 @@ from django.conf import settings
 from example.sheet_lib import googleSheet
 import datetime
 
+
 class GptLib:
     def __init__(self):
         # 設定 OpenAI API 金鑰
@@ -83,36 +84,76 @@ class GptLib:
             # 如果提供了使用者資訊，篩選相關資料
             user_specific_data = {}
             if user_id:
-                user_specific_data = self._filter_user_data(context_data, user_id, user_name)
+                user_specific_data = self._filter_user_data(
+                    context_data, user_id, user_name)
             date = datetime.datetime.now().strftime('%Y/%m/%d')
-            # 組合提示詞
-            # system_prompt = f"""
-            # 今天日期是：{date}，發問的人名子叫：{user_name}。請根據以下資料回答問題。
-            # 你是一個協助基督教會服事的AI助理，名叫「服事提醒小天使」。你可以回答關於教會服事的相關問題。
-            # 請保持友善、專業的語氣，並在回答結尾使用適當的表情符號增加親和力。
-            # """
-            system_prompt = f"""
-            今天日期是：{date}，發問的人名子叫：{user_name}。請根據以下資料回答問題。
-            你是一個協助基督教會服事的AI助理，名叫「服事提醒小天使」，主要是提醒每週六的服事人員。你可以回答關於教會服事的相關問題。
-            你要根據個人服事表內容提供的上下文資料來回答問題。
-            請保持友善、專業的語氣，並在回答結尾使用適當的表情符號增加親和力，但不用再建議繼續的問答。
-            """
 
-            all_text = json.dumps(context_data['services'], ensure_ascii=False)
-            # print(all_text)
-            # 組合上下文資料為文字
-            context_text = json.dumps(user_specific_data if user_specific_data else context_data, ensure_ascii=False)
-            # print(f"Context : {context_text}， JSON Schema: {json_schema}")
-            # 創建完整提示詞
+            # 優化的 system prompt - 更清晰的角色定義和資料解讀指示
+            system_prompt = f"""你是「服事提醒小天使」，專門協助基督教會的服事排程管理AI助理。
+
+**當前資訊:**
+- 今天日期: {date}
+- 發問者: {user_name}
+
+**你的職責:**
+1. 根據提供的服事表資料回答問題
+2. 幫助教友查詢自己或他人的服事排程
+3. 提供準確的日期和服事類型資訊
+
+**回答原則:**
+- 優先使用「個人專屬資料」回答(如果有提供)
+- 若個人資料不足，再參考「完整服事表」
+- 日期格式為 mm/dd，請自動判斷年份(通常是今年或明年)
+- 回答要具體明確，包含日期和服事類型
+- 語氣友善專業，結尾可加上適當表情符號
+- 不需要建議繼續問答
+
+**服事類型說明:**
+{self._get_service_type_description()}
+"""
+
+            # 格式化個人專屬資料
+            user_context = ""
+            if user_specific_data and user_specific_data.get("services"):
+                user_context = self._format_user_context(
+                    user_specific_data, user_name)
+
+            # 格式化完整服事表(作為參考)
+            all_services = self._format_all_services(context_data['services'])
+
+            # 創建完整提示詞 - 分層提供資料
             messages = [
-                {"role": "system", "content": system_prompt},
-                {"role": "system", "content": f"個人資料與服事表：{context_text}和完整的服事表: {all_text}"},
-                {"role": "user", "content": user_message}
+                {"role": "system", "content": system_prompt}
             ]
+
+            # 如果有個人資料，優先提供
+            if user_context:
+                messages.append({
+                    "role": "system",
+                    "content": f"**{user_name} 的個人專屬資料(優先使用此資料回答):**\n{user_context}"
+                })
+
+            # 提供完整服事表作為參考
+            messages.append({
+                "role": "system",
+                "content": f"**完整服事表(作為參考，用於回答其他人的服事或統計問題):**\n{all_services}"
+            })
+
+            # 加入範例問答(Few-shot learning) - 提高準確度
+            messages.extend([
+                {"role": "user", "content": "我下次服事是什麼時候?"},
+                {"role": "assistant",
+                    "content": f"讓我查看您的服事安排...\n\n{user_name}您好！您的下次服事是:\n📅 12/21 - 司琴\n\n請記得提前準備喔！🎹✨"},
+                {"role": "user", "content": "12月我有幾次服事?"},
+                {"role": "assistant", "content": f"{user_name}您好！我幫您統計了12月的服事:\n\n您在12月總共有 2 次服事:\n📅 12/07 - 視聽\n📅 12/21 - 司琴\n\n感謝您的擺上！🙏💖"}
+            ])
+
+            # 最後加入使用者的實際問題
+            messages.append({"role": "user", "content": user_message})
 
             # 呼叫 OpenAI API
             response = openai.ChatCompletion.create(
-                model="gpt-4.1-mini",  # 可以根據需要替換為其他模型
+                model="gpt-5",  # 可以根據需要替換為其他模型
                 messages=messages,
                 max_tokens=600,
                 temperature=0.7
@@ -167,3 +208,53 @@ class GptLib:
                     })
 
         return result
+
+    def _get_service_type_description(self):
+        """取得服事類型說明"""
+        from example.conf import field_code_conf
+        descriptions = []
+        for code, name in sorted(field_code_conf.items()):
+            descriptions.append(f"- {name}")
+        return "\n".join(descriptions)
+
+    def _format_user_context(self, user_data, user_name):
+        """格式化個人專屬資料為易讀格式"""
+        if not user_data or not user_data.get("services"):
+            return f"{user_name} 目前沒有排定的服事。"
+
+        formatted = f"📋 {user_name} 的服事排程:\n\n"
+
+        # 依日期排序
+        services_by_date = sorted(
+            user_data["services"], key=lambda x: x["date"])
+
+        for service_entry in services_by_date:
+            date = service_entry["date"]
+            services = service_entry["services"]
+            service_names = [s["type"] for s in services]
+            formatted += f"📅 {date} - {' / '.join(service_names)}\n"
+
+        return formatted.strip()
+
+    def _format_all_services(self, services_data):
+        """格式化完整服事表為結構化文字"""
+        if not services_data:
+            return "目前沒有服事資料。"
+
+        formatted = "📊 完整服事表:\n\n"
+
+        # 依日期排序
+        services_sorted = sorted(services_data, key=lambda x: x["date"])
+
+        for service_entry in services_sorted:
+            date = service_entry["date"]
+            formatted += f"📅 {date}:\n"
+
+            # 按服事類型分組
+            for service in service_entry["services"]:
+                service_type = service["type"]
+                person = service["person"]
+                formatted += f"  • {service_type}: {person}\n"
+            formatted += "\n"
+
+        return formatted.strip()
