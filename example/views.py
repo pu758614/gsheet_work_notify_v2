@@ -90,7 +90,7 @@ def lineCallback(request):
             send_msg = f'您接下來暫時沒有其他服事呦！'+line_lib.emoji("10008E")
     elif (msg == '小天使, 我要把接下來的服事加入行事曆！'):
         # 這裡可以加入生成並回傳 .ics 檔案的邏輯
-        send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/export_ics?user_id=" + \
+        send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/api/export_ics?user_id=" + \
             data['user_id']
     elif (msg == '小天使, 請問這怎麼用?'):
         notify_user_name = data['user_name']
