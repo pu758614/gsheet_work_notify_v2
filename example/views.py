@@ -169,26 +169,26 @@ def export_ics(request):
         start_time = work_date.replace(hour=17, minute=0, second=0)
         end_time = work_date.replace(hour=18, minute=0, second=0)
 
-        # 為每個服事項目建立事件
-        for work_name in work_names:
-            event = Event()
-            event.add('summary', f'服事：{work_name}')
-            event.add('dtstart', start_time)
-            event.add('dtend', end_time)
-            event.add('dtstamp', datetime.now())
-            event.add('description',
-                      f'{user_name} 在 {work_date_str} 的服事項目：{work_name}')
-            event.add('location', '三民聖教會')
-            event.add('status', 'CONFIRMED')
+        # 將同一天的所有服事合併成一個事件
+        work_names_str = '、'.join(work_names)
+        event = Event()
+        event.add('summary', f'服事：{work_names_str}')
+        event.add('dtstart', start_time)
+        event.add('dtend', end_time)
+        event.add('dtstamp', datetime.now())
+        event.add('description',
+                  f'{user_name} 在 {work_date_str} 的服事項目：{work_names_str}')
+        event.add('location', '三民聖教會')
+        event.add('status', 'CONFIRMED')
 
-            # 設定提醒 (前一天提醒)
-            # alarm = Alarm()
-            # alarm.add('action', 'DISPLAY')
-            # alarm.add('trigger', timedelta(days=-1))
-            # alarm.add('description', f'明天有服事：{work_name}')
-            # event.add_component(alarm)
+        # 設定提醒 (前一天提醒)
+        # alarm = Alarm()
+        # alarm.add('action', 'DISPLAY')
+        # alarm.add('trigger', timedelta(days=-1))
+        # alarm.add('description', f'明天有服事：{work_names_str}')
+        # event.add_component(alarm)
 
-            cal.add_component(event)
+        cal.add_component(event)
 
     # 產生 .ics 檔案內容
     ics_content = cal.to_ical()
