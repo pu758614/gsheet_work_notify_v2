@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('example.urls')),
     path('api/lineCallback', views.lineCallback),
-    path('trigger_notify', views.trigger_notify)
+    path('trigger_notify', views.trigger_notify),
+    path('api/export_ics', views.export_ics)
 ]
