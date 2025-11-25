@@ -95,7 +95,7 @@ def lineCallback(request):
         work_list = googleSheet(now_year).getNextWorks(user_work_name_list)
 
         if not work_list or len(work_list) == 0:
-            send_msg = f'沒有您接下來的服事喔！'+line_lib.emoji("10008E")
+            send_msg = f'您接下來暫時沒有其他服事呦！'+line_lib.emoji("10008E")
         else:
             send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/api/export_ics?user_id=" + \
                 data['user_id']
