@@ -89,9 +89,16 @@ def lineCallback(request):
         else:
             send_msg = f'您接下來暫時沒有其他服事呦！'+line_lib.emoji("10008E")
     elif (msg == '小天使, 我要把接下來的服事加入行事曆！'):
-        # 這裡可以加入生成並回傳 .ics 檔案的邏輯
-        send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/api/export_ics?user_id=" + \
-            data['user_id']
+        # 檢查是否有接下來的服事
+        now_year = datetime.now().strftime('%Y')
+        user_work_name_list = googleSheet('user').getWorkNames(data['user_id'])
+        work_list = googleSheet(now_year).getNextWorks(user_work_name_list)
+
+        if not work_list or len(work_list) == 0:
+            send_msg = f'沒有您接下來的服事喔！'+line_lib.emoji("10008E")
+        else:
+            send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/api/export_ics?user_id=" + \
+                data['user_id']
     elif (msg == '小天使, 請問這怎麼用?'):
         notify_user_name = data['user_name']
         send_msg = f"嗨 {notify_user_name} ~ 您可以點選下方選單日~六設定通知日，若不想接收通知請點選「關閉提醒」。\n\n"
@@ -151,6 +158,10 @@ def export_ics(request):
     # 取得今年的服事列表
     now_year = datetime.now().strftime('%Y')
     work_list = googleSheet(now_year).getNextWorks(user_work_name_list)
+
+    # 檢查是否有服事
+    if not work_list or len(work_list) == 0:
+        return HttpResponse('沒有您接下來的服事喔', content_type='text/plain; charset=utf-8')
 
     # 建立 iCalendar
     cal = Calendar()

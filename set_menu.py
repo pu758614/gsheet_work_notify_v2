@@ -1,73 +1,100 @@
+from linebot import LineBotApi, WebhookParser
+from django.conf import settings
+import json
+import requests
 import os
 import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE","api.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "api.settings")
 django.setup()
 
-import requests
-import json
-from django.conf import settings
-from linebot import LineBotApi, WebhookParser
 
 # 設定 headers，輸入你的 Access Token，記得前方要加上「Bearer 」( 有一個空白 )
 access_token = settings.LINE_CHANNEL_ACCESS_TOKEN
-headers = {'Authorization':f"Bearer {access_token}",'Content-Type':'application/json'}
+headers = {'Authorization': f"Bearer {access_token}",
+           'Content-Type': 'application/json'}
 
 body = {
     'size': {'width': 2498, 'height': 928},   # 設定尺寸
     'selected': 'true',                        # 預設是否顯示
     'name': 'Richmenu demo',                   # 選單名稱
     'chatBarText': '請以週報.群組記事本的為主',            # 選單在 LINE 顯示的標題
-    'areas':[                                  # 選單內容
+    'areas': [                                  # 選單內容
         {
-          'bounds': {'x': 0, 'y': 0, 'width': 314, 'height': 332}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜日提醒我'}                # 點擊後傳送文字
+            'bounds': {'x': 0, 'y': 0, 'width': 314, 'height': 332},  # 選單位置與大小
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜日提醒我'}
         },
         {
-          'bounds': {'x': 315, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜一提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 315, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜一提醒我'}
         },
         {
-          'bounds': {'x': 633, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜二提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 633, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜二提醒我'}
         },
         {
-          'bounds': {'x': 941, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜三提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 941, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜三提醒我'}
         },
         {
-          'bounds': {'x': 1257, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜四提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 1257, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜四提醒我'}
         },
         {
-          'bounds': {'x': 1567, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜五提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 1567, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜五提醒我'}
         },
         {
-          'bounds': {'x': 1882, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請禮拜六提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 1882, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請禮拜六提醒我'}
         },
         {
-          'bounds': {'x': 2190, 'y': 0, 'width': 309, 'height': 329}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請先不用提醒我'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 2190, 'y': 0, 'width': 309, 'height': 329},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請先不用提醒我'}
         },
         {
-          'bounds': {'x': 837, 'y': 341, 'width': 832, 'height': 583}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請問我接下來服事有哪些?'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 0, 'y': 338, 'width': 836, 'height': 590},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請問這怎麼用?'}
         },
         {
-          'bounds': {'x': 0, 'y': 338, 'width': 836, 'height': 590}, # 選單位置與大小
-          'action': {'type': 'message', 'text': '小天使, 請問這怎麼用?'}                # 點擊後傳送文字
+            # 選單位置與大小
+            'bounds': {'x': 837, 'y': 341, 'width': 832, 'height': 583},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 請問我接下來服事有哪些?'}
+        },
+
+        {
+            # 選單位置與大小
+            'bounds': {'x': 1661, 'y': 338, 'width': 836, 'height': 590},
+            # 點擊後傳送文字
+            'action': {'type': 'message', 'text': '小天使, 我要把接下來的服事加入行事曆！'}
         },
 
 
     ]
-  }
+}
 
 
 req = requests.request('POST', 'https://api.line.me/v2/bot/richmenu',
-                      headers=headers,data=json.dumps(body).encode('utf-8'))
+                       headers=headers, data=json.dumps(body).encode('utf-8'))
 if req.status_code != 200:
-    print('Step 1 error',req.text)
+    print('Step 1 error', req.text)
     exit()
 rich_menu_id = req.json()['richMenuId']
 
@@ -92,12 +119,11 @@ else:
     print(response.text)
 
 
+headers = {'Authorization': f'Bearer {access_token}'}
 
-
-headers = {'Authorization':f'Bearer {access_token}'}
-
-req = requests.request('POST', f'https://api.line.me/v2/bot/user/all/richmenu/{rich_menu_id}', headers=headers)
+req = requests.request(
+    'POST', f'https://api.line.me/v2/bot/user/all/richmenu/{rich_menu_id}', headers=headers)
 if req.status_code != 200:
-    print('Step 3 error',req.text)
+    print('Step 3 error', req.text)
     exit()
 print(req.text)
