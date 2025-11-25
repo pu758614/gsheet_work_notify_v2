@@ -97,7 +97,7 @@ def lineCallback(request):
         if not work_list or len(work_list) == 0:
             send_msg = f'您接下來暫時沒有其他服事呦！'+line_lib.emoji("10008E")
         else:
-            send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！(若line內建瀏覽器無法下載 可使用其他瀏覽器開啟連結)\n請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/api/export_ics?user_id=" + \
+            send_msg = "以下連結可以下載您的服事行事曆檔案，打開後可以幫你把服事匯進您的行事曆喔！\n(若line內建瀏覽器無法下載 可使用其他瀏覽器開啟連結)\n請點擊連結下載：\n http://gsheet-work-notify-v2.vercel.app/api/export_ics?user_id=" + \
                 data['user_id']
     elif (msg == '小天使, 請問這怎麼用?'):
         notify_user_name = data['user_name']
