@@ -5,6 +5,7 @@ import tempfile
 from django.conf import settings
 from example.conf import field_code_conf
 
+
 class googleSheet:
     def __init__(self, sheet_title):
         # self.spreadsheet_id = spreadsheet_id
@@ -61,16 +62,14 @@ class googleSheet:
         # data = [x for x in data if x != ['']]
         return new_data
 
-    # pygsheets insert last row
+    # pygsheets insert at row 2
     def insert_sheet(self, data):
         try:
             worksheet = self.sheet.worksheet_by_title(self.sheet_title)
-            worksheet.append_table(data,start='A2')
+            worksheet.insert_rows(row=1, number=1, values=[data])
         except Exception as e:
             return False
         return True
-
-
 
     def update_sheet(self, site, data):
         worksheet = self.sheet.worksheet_by_title(self.sheet_title)
@@ -88,19 +87,18 @@ class googleSheet:
 
     def add_user(self, user_id, user_name):
 
-        data = [user_id, user_name,user_name,4]
+        data = [user_id, user_name, user_name, 4]
         self.insert_sheet(data)
 
     def set_user_notify_day(self, user_id, day):
         data = self.read_sheet_all()
         for index, row in enumerate(data):
-            #數字轉英文字
+            # 數字轉英文字
             if (row[0] == user_id):
-                self.update_sheet(f"D{index+1}",day)
+                self.update_sheet(f"D{index+1}", day)
                 break
 
-
-    def getWorkNames(self,user_id):
+    def getWorkNames(self, user_id):
         data = self.read_sheet_all()
         name_list = []
         for index, row in enumerate(data):
@@ -109,9 +107,8 @@ class googleSheet:
                 break
         return name_list
 
-
     # 兩個日期比較大小
-    def compare_date(self,date1, date2):
+    def compare_date(self, date1, date2):
         date1 = datetime.datetime.strptime(date1, '%m/%d')
         date2 = datetime.datetime.strptime(date2, '%m/%d')
         if date1 > date2:
@@ -121,52 +118,51 @@ class googleSheet:
         else:
             return 0
 
-    def is_date(self,date):
+    def is_date(self, date):
         try:
             datetime.datetime.strptime(date, '%m/%d')
             return True
         except ValueError:
             return False
 
-
-    def getNextWorks(self,name_list):
-        data_list=self.read_sheet_all()
+    def getNextWorks(self, name_list):
+        data_list = self.read_sheet_all()
         work_date_list = {}
         now_date = datetime.datetime.now().strftime('%m/%d')
 
         for row in data_list:
             work_date = row[0]
-            if(not self.is_date(work_date)):
+            if (not self.is_date(work_date)):
                 continue
-            is_over = self.compare_date(work_date,now_date)
-            if(is_over==-1):
+            is_over = self.compare_date(work_date, now_date)
+            if (is_over == -1):
                 continue
             for index, row_data in enumerate(row):
-                if(row_data in name_list):
+                if (row_data in name_list):
                     field_code = chr(65+index)
-                    if(field_code not in field_code_conf):
+                    if (field_code not in field_code_conf):
                         continue
-                    if(work_date not in work_date_list):
+                    if (work_date not in work_date_list):
                         work_date_list[work_date] = []
                     work_name = field_code_conf[field_code]
                     work_date_list[work_date].append(work_name)
         return work_date_list
 
-    def get_user_info(self,user_id):
+    def get_user_info(self, user_id):
         data = self.read_sheet_all()
         user_info = {}
         for index, row in enumerate(data):
             if (row[0] == user_id):
                 user_info = {
-                    'user_id':row[0],
-                    'user_name':row[1],
-                    'notify_day':int(row[3])
+                    'user_id': row[0],
+                    'user_name': row[1],
+                    'notify_day': int(row[3])
                 }
                 break
         return user_info
 
-    def write_record(self,user_id,log_type,request,response):
+    def write_record(self, user_id, log_type, request, response):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         now = f'.{now}'
-        log_data = [now,user_id,log_type,request,response]
+        log_data = [now, user_id, log_type, request, response]
         self.insert_sheet(log_data)
