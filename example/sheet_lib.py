@@ -137,7 +137,25 @@ class googleSheet:
             if (is_over == -1):
                 continue
             for index, row_data in enumerate(row):
-                if (row_data in name_list):
+                # 處理多人服事，支援「.」、「,」和換行符號分隔
+                cell_names = [row_data]  # 預設單人
+                # 先將換行符號轉換為統一分隔符
+                row_data_processed = row_data.replace(
+                    '\n', '|').replace('\r', '')
+                # 支援多種分隔符
+                if '.' in row_data_processed:
+                    cell_names = row_data_processed.split('.')
+                elif ',' in row_data_processed:
+                    cell_names = row_data_processed.split(',')
+                elif '|' in row_data_processed:
+                    cell_names = row_data_processed.split('|')
+
+                # 去除空白並檢查是否有符合的名字
+                cell_names = [name.strip()
+                              for name in cell_names if name.strip()]
+
+                # 檢查是否有任何名字在 name_list 中
+                if any(name in name_list for name in cell_names):
                     field_code = chr(65+index)
                     if (field_code not in field_code_conf):
                         continue
