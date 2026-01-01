@@ -62,7 +62,6 @@ class googleSheet:
         # data = [x for x in data if x != ['']]
         return new_data
 
-    # pygsheets insert at row 2
     def insert_sheet(self, data):
         try:
             worksheet = self.sheet.worksheet_by_title(self.sheet_title)

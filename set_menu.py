@@ -98,14 +98,14 @@ if req.status_code != 200:
     exit()
 rich_menu_id = req.json()['richMenuId']
 
-file_path = "/code/richmenu.png"
+file_path = "/code/richmenu.jpg"
 # API端點
 url = f"https://api-data.line.me/v2/bot/richmenu/{rich_menu_id}/content"
 
 # 請求標頭
 headers = {
     "Authorization": f"Bearer {access_token}",
-    "Content-Type": "image/png"
+    "Content-Type": "image/jpeg"
 }
 
 with open(file_path, "rb") as file:

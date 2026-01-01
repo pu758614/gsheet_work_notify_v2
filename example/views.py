@@ -212,6 +212,7 @@ def export_ics(request):
     return response
 
 
+@api_view(["GET"])
 def index(request):
     now = datetime.now()
     msg = daily_notify_lib.daily_notify_test()
