@@ -225,7 +225,7 @@ def index(request):
         {msg}
     </html>
     '''
-    time.sleep(15)
+    # time.sleep(15)
 
     return HttpResponse(html,)
     # return HttpResponse(html)
