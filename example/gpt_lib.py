@@ -115,6 +115,7 @@ class GptLib:
 - 回答要具體明確，包含日期和服事類型
 - 語氣友善專業
 - 不需要建議繼續問答
+- 回覆將顯示在 LINE 訊息中，LINE 不支援 Markdown，所以絕對不要使用 **粗體**、*斜體*、# 標題、- 列表 等 Markdown 語法，請用純文字格式回覆
 
 **服事類型說明:**
 {self._get_service_type_description()}
@@ -151,10 +152,10 @@ class GptLib:
             messages.extend([
                 {"role": "user", "content": "7/11 我有沒有被排到服事？"},
                 {"role": "assistant",
-                    "content": f"{user_name}您好，我幫您核對了 7/11 的服事表：\n\n我逐一檢查了 7/11 當天所有服事欄位，您的名字沒有出現在任何欄位中。\n\n所以 7/11 您**沒有被排到服事**。"},
+                    "content": f"{user_name}您好，我幫您核對了 7/11 的服事表：\n\n我逐一檢查了 7/11 當天所有服事欄位，您的名字沒有出現在任何欄位中。\n\n所以 7/11 您沒有被排到服事。"},
                 {"role": "user", "content": "那 7/25 呢？"},
                 {"role": "assistant",
-                    "content": f"{user_name}您好，我核對了 7/25 的服事表：\n\n📅 7/25 - 您有被排到**樂手**\n\n請記得提前準備喔！🎵"}
+                    "content": f"{user_name}您好，我核對了 7/25 的服事表：\n\n📅 7/25 - 您有被排到 領歌\n\n請記得提前準備喔！🎵"}
             ])
 
             # 最後加入使用者的實際問題
