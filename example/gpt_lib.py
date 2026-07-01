@@ -88,7 +88,7 @@ class GptLib:
                     context_data, user_id, user_name)
             date = datetime.datetime.now().strftime('%Y/%m/%d')
 
-            # 優化的 system prompt - 更清晰的角色定義和資料解讀指示
+            # 優化的 system prompt - 強調準確性和事實核查
             system_prompt = f"""你是「服事提醒小天使」，專門協助基督教會的服事排程管理AI助理。
 
 **當前資訊:**
@@ -100,12 +100,20 @@ class GptLib:
 2. 幫助教友查詢自己或他人的服事排程
 3. 提供準確的日期和服事類型資訊
 
+**嚴格準確性規則（最重要）:**
+- 你只能根據下方提供的資料回答，絕對不可以猜測或編造
+- 如果某個日期的某個服事欄位裡「沒有出現」該人的名字，就代表他在那天「沒有」該服事
+- 判斷某人是否有服事時，必須逐一檢查該日期每個服事欄位的人員名單，名字必須完全吻合才算有排到
+- 人員欄位中用「.」或「、」分隔代表多人，例如「雅慧.蔚均」代表兩個人：雅慧 和 蔚均
+- 如果資料中找不到相關資訊，直接說「沒有找到相關資料」，不要自行推測
+- 回答前請先在內心逐一核對資料，確認無誤後再回覆
+
 **回答原則:**
 - 優先使用「個人專屬資料」回答(如果有提供)
 - 若個人資料不足，再參考「完整服事表」
 - 日期格式為 mm/dd，請自動判斷年份(通常是今年或明年)
 - 回答要具體明確，包含日期和服事類型
-- 語氣友善專業，結尾可加上適當表情符號
+- 語氣友善專業
 - 不需要建議繼續問答
 
 **服事類型說明:**
@@ -139,13 +147,14 @@ class GptLib:
                 "content": f"**完整服事表(作為參考，用於回答其他人的服事或統計問題):**\n{all_services}"
             })
 
-            # 加入範例問答(Few-shot learning) - 提高準確度
+            # 加入準確性範例(Few-shot learning) - 示範如何核對資料
             messages.extend([
-                {"role": "user", "content": "我下次服事是什麼時候?"},
+                {"role": "user", "content": "7/11 我有沒有被排到服事？"},
                 {"role": "assistant",
-                    "content": f"讓我查看您的服事安排...\n\n{user_name}您好！您的下次服事是:\n📅 12/21 - 司琴\n\n請記得提前準備喔！🎹✨"},
-                {"role": "user", "content": "12月我有幾次服事?"},
-                {"role": "assistant", "content": f"{user_name}您好！我幫您統計了12月的服事:\n\n您在12月總共有 2 次服事:\n📅 12/07 - 視聽\n📅 12/21 - 司琴\n\n感謝您的擺上！🙏💖"}
+                    "content": f"{user_name}您好，我幫您核對了 7/11 的服事表：\n\n我逐一檢查了 7/11 當天所有服事欄位，您的名字沒有出現在任何欄位中。\n\n所以 7/11 您**沒有被排到服事**。"},
+                {"role": "user", "content": "那 7/25 呢？"},
+                {"role": "assistant",
+                    "content": f"{user_name}您好，我核對了 7/25 的服事表：\n\n📅 7/25 - 您有被排到**樂手**\n\n請記得提前準備喔！🎵"}
             ])
 
             # 最後加入使用者的實際問題
@@ -155,7 +164,7 @@ class GptLib:
             response = openai.ChatCompletion.create(
                 model="gpt-5.4-mini",  # 可以根據需要替換為其他模型
                 messages=messages,
-                temperature=0.7
+                temperature=0.2
             )
 
             # 獲取 GPT 的回應
@@ -192,12 +201,19 @@ class GptLib:
 
         # 如果找到使用者資料，篩選相關的服事資料
         if user_info and user_info["service_names"]:
-            service_names = user_info["service_names"]
+            service_names = set(user_info["service_names"])
             for service_entry in context_data["services"]:
                 relevant_services = []
                 for service in service_entry["services"]:
-                    # 檢查此服事是否與使用者相關
-                    if service["person"] in service_names or any(name in service["person"] for name in service_names):
+                    # 將服事人員欄位依分隔符號拆開，逐一精確比對
+                    import re
+                    persons_in_cell = set(
+                        re.split(r'[.、,，/]', service["person"]))
+                    # 去除空白
+                    persons_in_cell = {p.strip()
+                                       for p in persons_in_cell if p.strip()}
+                    # 精確比對：使用者名稱必須完全匹配其中一個人名
+                    if service_names & persons_in_cell:
                         relevant_services.append(service)
 
                 if relevant_services:
@@ -236,24 +252,24 @@ class GptLib:
         return formatted.strip()
 
     def _format_all_services(self, services_data):
-        """格式化完整服事表為結構化文字"""
+        """格式化完整服事表為結構化文字，使用表格式呈現方便 GPT 精確查找"""
         if not services_data:
             return "目前沒有服事資料。"
 
-        formatted = "📊 完整服事表:\n\n"
+        formatted = "完整服事表（每一列代表一個日期，每個欄位列出負責人員）:\n\n"
 
         # 依日期排序
         services_sorted = sorted(services_data, key=lambda x: x["date"])
 
         for service_entry in services_sorted:
             date = service_entry["date"]
-            formatted += f"📅 {date}:\n"
+            formatted += f"【{date}】"
 
-            # 按服事類型分組
+            # 按服事類型列出，用 | 分隔方便辨識
+            parts = []
             for service in service_entry["services"]:
-                service_type = service["type"]
-                person = service["person"]
-                formatted += f"  • {service_type}: {person}\n"
+                parts.append(f"{service['type']}:{service['person']}")
+            formatted += " | ".join(parts)
             formatted += "\n"
 
         return formatted.strip()
