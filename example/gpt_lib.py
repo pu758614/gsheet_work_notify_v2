@@ -155,7 +155,6 @@ class GptLib:
             response = openai.ChatCompletion.create(
                 model="gpt-5.4-mini",  # 可以根據需要替換為其他模型
                 messages=messages,
-                max_tokens=600,
                 temperature=0.7
             )
 
